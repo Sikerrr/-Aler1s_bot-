@@ -1,0 +1,68 @@
+name: Content notifier
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: content-notifier
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Получить код репозитория
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Установить Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установить библиотеки
+        run: pip install -r requirements.txt
+
+      - name: Проверить источники и отправить новое
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+        run: python notifier.py
+
+      - name: Сохранить seen.json
+        run: |
+          changed=0
+          if ! git diff --quiet -- seen.json; then
+            git add seen.json
+            changed=1
+          fi
+          last=$(git log -1 --format=%ct -- .keepalive 2>/dev/null | head -1)
+          last=${last:-0}
+          if [ $(( ( $(date +%s) - last ) / 86400 )) -ge 45 ]; then
+            date -u +"%Y-%m-%dT%H:%M:%SZ" > .keepalive
+            git add .keepalive
+            changed=1
+          fi
+          if [ "$changed" = "0" ]; then
+            echo "Изменений нет"
+            exit 0
+          fi
+          git config user.name "notifier-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git commit -m "chore: update notification state"
+          for attempt in 1 2 3; do
+            if git push; then break; fi
+            git pull --rebase --autostash
+            sleep 5
+          done
