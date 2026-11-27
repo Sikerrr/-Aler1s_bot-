@@ -1,0 +1,31 @@
+{
+  "telegram": {
+    "chat_id": ""
+  },
+  "settings": {
+    "interval_minutes": 10,
+    "max_messages_per_run": 20,
+    "first_run_silent": true,
+    "max_age_days": 7,
+    "request_timeout": 20,
+    "notify_stream_end": true
+  },
+  "youtube": [
+    {
+      "name": "Google Developers (пример — замени)",
+      "channel_id": "UC_x5XG1OV2P6uZZ5FSM9Ttw"
+    }
+  ],
+  "twitch": [
+    {
+      "name": "Nix",
+      "login": "nix"
+    }
+  ],
+  "rss": [
+    {
+      "name": "Steam: Dota 2 (пример)",
+      "url": "https://store.steampowered.com/feeds/news/app/570/?cc=RU&l=russian"
+    }
+  ]
+}

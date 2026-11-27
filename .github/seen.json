@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "sources": {
+    "youtube:UC_x5XG1OV2P6uZZ5FSM9Ttw": [
+      "WN5O4vWCa54",
+      "fpQcDQJQLhg",
+      "WN-JK-hMAyg"
+    ],
+    "rss:https://store.steampowered.com/feeds/news/app/570/?cc=RU&l=russian": [
+      "https://store.steampowered.com/news/app/570/view/689774670193362169"
+    ]
+  },
+  "live": {},
+  "telegram_offset": 308026827
+}
